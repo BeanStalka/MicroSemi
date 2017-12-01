@@ -1,0 +1,10 @@
+
+menu "APP(zl380xx) configuration"
+
+config HBI_BOOT
+	int "hbi boot"
+	default 0
+	help
+	  should be one of 0, 1
+
+endmenu

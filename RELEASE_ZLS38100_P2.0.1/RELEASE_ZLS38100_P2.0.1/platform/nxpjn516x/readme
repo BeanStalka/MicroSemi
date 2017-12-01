@@ -1,0 +1,11 @@
+this folder contain Omnivision platform enviroment setup. this directory contains following folders:
+
+sdk - contains the omnivision sdk 
+
+tools - contains toolchain package to build sdk
+
+driver - contains omnivision specific driver modules. consists of SSL and sound drivers
+
+doc - contains documentation on "How to" integrate ZL380xx SDK to OV SDK. 
+
+apps - contains sample applications for ov platforn

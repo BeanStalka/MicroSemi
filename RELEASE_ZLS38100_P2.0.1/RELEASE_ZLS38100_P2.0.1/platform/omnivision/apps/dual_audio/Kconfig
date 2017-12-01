@@ -1,0 +1,10 @@
+
+menu "APP(dual_audio) configuration"
+
+config SAMPLE_RATE
+	int "audio sample rate"
+	default 11025
+	help
+	  should be one of 8000, 11025, 16000
+
+endmenu

@@ -1,0 +1,227 @@
+menu "Audio Codec Support"
+
+config AUDIO_CODEC_EN
+	bool "Audio Codec enable"
+	help
+	  add audio codec support
+
+if AUDIO_CODEC_EN
+choice
+	prompt "Audio external CODEC to link"
+	help
+	  select the CODEC
+
+	config AUDIO_CODEC_EN_wm8960
+		bool "wm8960 DAC&ADC"
+	config AUDIO_CODEC_EN_wm8960_kd
+		bool "wm8960_kd DAC&ADC"
+	config AUDIO_CODEC_EN_da7323
+		bool "da7323 DAC&ADC"
+     config AUDIO_CODEC_EN_zl380xx
+		bool "zl380xx DAC&ADC"
+endchoice
+endif
+
+
+
+config AUDIO_CODEC_DAC_EN
+	bool "Audio Codec DAC enable"
+	default y if AUDIO_DEC_EN
+	default n if AUDIO_ENC_EN
+	help
+	  add audio codec DAC support
+
+if AUDIO_CODEC_DAC_EN
+
+choice
+	prompt "Audio external DAC to link"
+	help
+	  select the DAC
+
+	config AUDIO_DAC_EN_wm8955
+		bool "wm8955 DAC"
+	config AUDIO_DAC_EN_wm8978
+		bool "wm8978 DAC"
+	config AUDIO_DAC_EN_ti3100
+		bool "ti3100 DAC"	
+	config AUDIO_DAC_EN_aic3256
+		bool "aic3256 DAC"	
+	config AUDIO_DAC_EN_nau8814
+		bool "nau8814 DAC"		
+	config AUDIO_DAC_EN_wm8960
+		bool "wm8960 DAC"			
+	config AUDIO_DAC_EN_ht82v731
+		bool "ht82v731 DAC"			
+	config AUDIO_DAC_EN_hdmi_sii9022
+		bool "hdmi sii9022 DAC"			
+	config AUDIO_DAC_EN_aic3262
+		bool "TI AIC3262 DAC"			
+	config AUDIO_DAC_EN_da7323
+		bool "da7323 DAC"		
+	config AUDIO_DAC_EN_da7323_halfduplex
+		bool "da7323 HalfDuplex"
+endchoice
+
+endif
+
+config AUDIO_CODEC_ADC_EN
+	bool "Audio Codec ADC enable"
+	default y if AUDIO_ENC_EN
+	default n if AUDIO_DEC_EN
+	help
+	  add audio codec ADC support
+
+if AUDIO_CODEC_ADC_EN
+
+choice
+	prompt "Audio external ADC to link"
+	help
+	  select the external ADC
+
+	config AUDIO_ADC_EN_wm8978
+		bool "wm8978 ADC"
+	config AUDIO_ADC_EN_nau8814
+		bool "nau8814 ADC"	
+	config AUDIO_ADC_EN_wm8960
+		bool "wm8960 ADC"			
+	config AUDIO_ADC_EN_aic3256
+		bool "aic3256 ADC"	
+	config AUDIO_ADC_EN_dm
+		bool "digital mic ADC"	
+	config AUDIO_ADC_EN_aic3262
+		bool "TI AIC3262 ADC"	
+	config AUDIO_ADC_EN_da7323
+		bool "da7323 ADC"		
+endchoice
+
+endif
+
+if AUDIO_DAC_EN_da7323 || AUDIO_ADC_EN_da7323 ||AUDIO_CODEC_EN_da7323
+
+config DA7323_DIAGNOSTICS
+	bool "enable DA7323 diagnostics"
+	help
+	  print out more information during calls to codec API
+
+config DA7323_DSP_BYPASS
+	bool "DA7323 ignore the DSP totally"
+	help
+	  the bypass mode uses a smaller footprint
+
+if ! DA7323_DSP_BYPASS
+
+choice
+	prompt "DSP Graph to be used"
+	default DA7323_DSP_GRAPH_0D
+
+	config DA7323_DSP_GRAPH_0B
+		bool "0B == Generic mixer with no audio processing"
+
+	config DA7323_DSP_GRAPH_0D
+		bool "0D == Acustic Echo Cancellation at 16k and Noise Suppresion DSP function"
+
+	config DA7323_DSP_GRAPH_0E
+		bool "0E == Acustic Echo Cancellation at 16k and Noise Suppresion DSP function"
+
+	config DA7323_DSP_GRAPH_10
+		bool "10 == Acustic Echo Cancellation at 11k and Noise Suppresion DSP function"
+
+	config DA7323_DSP_GRAPH_11
+		bool "11 == Generic mixer with no audio processing for 1 MIC(Mono-Stereo)"
+
+	config DA7323_DSP_GRAPH_12
+		bool "12 == AEC/NS @11k for MIC1 (MonoToStereo)"
+
+
+endchoice
+
+choice
+	prompt "I2C block write mode used"
+	default DA7323_I2C_SINGLE_MODE
+	help
+	  There are three possible modes supported
+
+	config DA7323_I2C_SINGLE_MODE
+		bool "single I2C byte writes"	
+		help
+		  There are 3 ways that multiple DA7323 codec registers can be written.
+		  The simplest (and slowest) is to just write each register by itself
+		  in a single I2C transaction.
+		  The standard block mode can be used to transfer a sequence of contigueous
+		  registers. Typically 24 or 32 bit DSP registers are transfered in this way.
+		  The fast transfer mode is burst mode where multiple sets of 3 or 4 byte
+		  contiguous registers byte are chained together and the codec itself keeps
+		  track of which DSP address is actually being targetted.
+		  Note that OmniVision's SCCB is an implementation of the I2C protocol.
+	config DA7323_I2C_BLOCK_MODE
+		bool "standard multiple I2C byte block writes"	
+		help
+		  There are 3 ways that multiple DA7323 codec registers can be written.
+		  The simplest (and slowest) is to just write each register by itself
+		  in a single I2C transaction.
+		  The standard block mode can be used to transfer a sequence of contigueous
+		  registers. Typically 24 or 32 bit DSP registers are transfered in this way.
+		  The fast transfer mode is burst mode where multiple sets of 3 or 4 byte
+		  contiguous registers byte are chained together and the codec itself keeps
+		  track of which DSP address is actually being targetted.
+		  Note that OmniVision's SCCB is an implementation of the I2C protocol.
+	config DA7323_I2C_BURST_MODE
+		bool "special multiple I2C byte burst writes"	
+		help
+		  There are 3 ways that multiple DA7323 codec registers can be written.
+		  The simplest (and slowest) is to just write each register by itself
+		  in a single I2C transaction.
+		  The standard block mode can be used to transfer a sequence of contigueous
+		  registers. Typically 24 or 32 bit DSP registers are transfered in this way.
+		  The fast transfer mode is burst mode where multiple sets of 3 or 4 byte
+		  contiguous registers byte are chained together and the codec itself keeps
+		  track of which DSP address is actually being targetted.
+		  Note that OmniVision's SCCB is an implementation of the I2C protocol.
+
+endchoice
+
+endif
+endif
+if AUDIO_DAC_EN_aic3262 || AUDIO_ADC_EN_aic3262
+choice
+	prompt "Choose control interface for AIC3262"
+	config AIC3262_USE_SCCB
+		bool "sccb"
+	config AIC3262_USE_SIF
+		bool "SIF"
+endchoice
+
+if AIC3262_USE_SIF
+choice 
+	prompt "Choose SIF interface for AIC3262"
+	help
+		select the correct SIP interface, choose one of the four SIF interface
+	config AIC3262_SIF0_GPIO_NORMAL
+		bool "SIF0 GPIO shared pins"
+	config AIC3262_SIF0_SC_NORMAL
+		bool "SIF0 SC shared pins"
+	config AIC3262_SIF1_NORMAL
+		bool "SIF1 NORMAL pins"
+	config AIC3262_SIF1_SI_NORMAL
+		bool "SIF1 SI Shared pins"
+endchoice
+choice
+	prompt "Choose CS PIN"
+	help
+		select cs0 or cs1 for current SIF
+	config SIF_CS0
+		bool "select cs0"
+	config SIF_CS1
+		bool "selct cs1"
+endchoice
+endif
+choice
+	prompt "Choose input channel "
+	config AIC3262_USE_IN1
+		bool "IN1L IN1R"
+	config AIC3262_USE_IN2
+		bool "IN2L IN2R"
+endchoice
+endif
+
+endmenu
